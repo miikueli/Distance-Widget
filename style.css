@@ -1,0 +1,97 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.widget {
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 16px;
+  background: rgba(0, 0, 0, 0.64);
+  color: white;
+
+  border-radius: 4px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.85);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+
+  font-size: 30px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.icon {
+  font-size: 32px;
+}
+
+.label {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.value {
+  font-size: 32px;
+  font-weight: 950;
+}
+
+.help {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  max-width: 700px;
+  padding: 12px 14px;
+  background: rgba(0,0,0,0.72);
+  color: white;
+  font-size: 18px;
+  line-height: 1.4;
+  border-radius: 6px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Pieni versio: ?size=small */
+body.small .widget {
+  gap: 7px;
+  padding: 7px 11px;
+  font-size: 21px;
+}
+
+body.small .icon {
+  font-size: 23px;
+}
+
+body.small .label {
+  font-size: 19px;
+}
+
+body.small .value {
+  font-size: 23px;
+}
+
+/* Vasen alanurkka: ?position=left */
+body.left .widget {
+  left: 28px;
+  right: auto;
+}
+
+/* Yläreuna: ?position=top */
+body.top .widget {
+  top: 28px;
+  bottom: auto;
+}
