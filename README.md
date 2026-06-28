@@ -1,4 +1,4 @@
-# MiikuLive Distance Widget
+# MiikuLive Distance Widget — reset-napilla
 
 Erillinen widget päivän aikana kuljetulle matkalle.
 
@@ -6,9 +6,7 @@ Näyttää:
 
 `📍 Kuljettu tänään: 12.4 km`
 
-Tämä EI korvaa sääwidgettiä. Tee tälle oma repo, esimerkiksi:
-
-`Distance-Widget`
+Tämä EI korvaa sääwidgettiä.
 
 ## Tiedostot
 
@@ -23,41 +21,35 @@ Lataa GitHub-repoon nämä tiedostot:
 
 Settings → Pages → Deploy from a branch → main → /root → Save
 
-Osoite on sen jälkeen esimerkiksi:
+Osoite on esimerkiksi:
 
 `https://miikueli.github.io/Distance-Widget/`
 
-## Testaus
+## Käyttö
 
-Demo ilman GPS:ää:
+Normaali overlay ilman reset-nappia:
 
-`?demo=true`
+`https://miikueli.github.io/Distance-Widget/`
 
-Oikea GPS-versio:
+Reset-nappi näkyviin:
 
-avaa pelkkä osoite ilman parametreja.
+`https://miikueli.github.io/Distance-Widget/?controls=true`
 
-Nollaa päivän matka:
+Demo reset-napilla:
 
-`?reset=true`
-
-Kun matka on nollattu, poista `?reset=true`, muuten se nollaa aina uudestaan.
+`https://miikueli.github.io/Distance-Widget/?demo=true&controls=true`
 
 Pieni versio:
 
-`?size=small`
+`https://miikueli.github.io/Distance-Widget/?size=small`
 
-Vasen alanurkka:
+Vasempaan alanurkkaan:
 
-`?position=left`
+`https://miikueli.github.io/Distance-Widget/?position=left`
 
-Yläreuna:
+Yläreunaan:
 
-`?position=top`
-
-Oma teksti:
-
-`?label=Matka:`
+`https://miikueli.github.io/Distance-Widget/?position=top`
 
 ## IRL Pro
 
@@ -67,3 +59,9 @@ IRL Pro → Allow web overlays to access location → päälle
 
 Android:
 Asetukset → Sovellukset → IRL Pro → Käyttöoikeudet → Sijainti
+
+## Huomio resetistä
+
+Reset-nappi nollaa matkan vain siinä selaimessa/WebViewissä, jossa widget pyörii.
+
+Siksi IRL Prossa kannattaa käyttää reset-nappia suoraan IRL Pron layerin näkymässä.

@@ -1,13 +1,14 @@
 const distanceEl = document.getElementById("distance");
 const labelEl = document.getElementById("label");
 const helpEl = document.getElementById("help");
+const resetBtn = document.getElementById("resetBtn");
 
 const params = new URLSearchParams(window.location.search);
 
 const CONFIG = {
   demo: params.get("demo") === "true",
   help: params.get("help") === "true",
-  reset: params.get("reset") === "true",
+  controls: params.get("controls") === "true",
   gpsEnabled: params.get("gps") !== "false",
   label: params.get("label") || "Kuljettu tänään:",
   minMeters: Number(params.get("minMeters") || 10),
@@ -19,6 +20,7 @@ if (params.get("size") === "small") document.body.classList.add("small");
 if (params.get("position") === "left") document.body.classList.add("left");
 if (params.get("position") === "top") document.body.classList.add("top");
 if (CONFIG.help) helpEl.classList.remove("hidden");
+if (CONFIG.controls) resetBtn.classList.remove("hidden");
 
 labelEl.textContent = CONFIG.label;
 
@@ -27,15 +29,34 @@ const distanceStorageKey = `miikuliveDistanceKm_${todayKey}`;
 
 let distanceKm = Number(localStorage.getItem(distanceStorageKey) || "0");
 let lastPoint = null;
+let demoTimer = null;
 
-if (CONFIG.reset) {
-  distanceKm = 0;
-  localStorage.setItem(distanceStorageKey, "0");
+function saveDistance() {
+  localStorage.setItem(distanceStorageKey, String(distanceKm));
 }
 
 function updateDistanceText() {
   distanceEl.textContent = `${distanceKm.toFixed(1)} km`;
 }
+
+function resetDistance() {
+  distanceKm = 0;
+  lastPoint = null;
+  saveDistance();
+  updateDistanceText();
+
+  const oldText = resetBtn.textContent;
+  resetBtn.textContent = "Nollattu!";
+  setTimeout(() => {
+    resetBtn.textContent = oldText;
+  }, 1200);
+}
+
+resetBtn.addEventListener("click", resetDistance);
+resetBtn.addEventListener("touchstart", (event) => {
+  event.preventDefault();
+  resetDistance();
+}, { passive: false });
 
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -85,7 +106,7 @@ function handlePosition(position) {
     calculatedSpeedKmh < CONFIG.maxSpeedKmh
   ) {
     distanceKm += segmentKm;
-    localStorage.setItem(distanceStorageKey, String(distanceKm));
+    saveDistance();
   }
 
   lastPoint = currentPoint;
@@ -119,12 +140,12 @@ function startGps() {
 }
 
 function startDemo() {
-  let demoDistance = 12.4;
-  distanceEl.textContent = `${demoDistance.toFixed(1)} km`;
+  distanceKm = 12.4;
+  updateDistanceText();
 
-  setInterval(() => {
-    demoDistance += Math.random() * 0.25;
-    distanceEl.textContent = `${demoDistance.toFixed(1)} km`;
+  demoTimer = setInterval(() => {
+    distanceKm += Math.random() * 0.25;
+    updateDistanceText();
   }, 3000);
 }
 
