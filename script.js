@@ -1,14 +1,10 @@
 const distanceEl = document.getElementById("distance");
 const labelEl = document.getElementById("label");
-const helpEl = document.getElementById("help");
-const resetBtn = document.getElementById("resetBtn");
 
 const params = new URLSearchParams(window.location.search);
 
 const CONFIG = {
   demo: params.get("demo") === "true",
-  help: params.get("help") === "true",
-  controls: params.get("controls") === "true",
   gpsEnabled: params.get("gps") !== "false",
   label: params.get("label") || "Kuljettu tänään:",
   minMeters: Number(params.get("minMeters") || 10),
@@ -19,17 +15,16 @@ const CONFIG = {
 if (params.get("size") === "small") document.body.classList.add("small");
 if (params.get("position") === "left") document.body.classList.add("left");
 if (params.get("position") === "top") document.body.classList.add("top");
-if (CONFIG.help) helpEl.classList.remove("hidden");
-if (CONFIG.controls) resetBtn.classList.remove("hidden");
 
 labelEl.textContent = CONFIG.label;
 
 const todayKey = new Date().toISOString().slice(0, 10);
 const distanceStorageKey = `miikuliveDistanceKm_${todayKey}`;
+const resetCommandKey = "miikuliveDistanceResetCommand";
 
 let distanceKm = Number(localStorage.getItem(distanceStorageKey) || "0");
 let lastPoint = null;
-let demoTimer = null;
+let lastSeenResetCommand = localStorage.getItem(resetCommandKey) || "";
 
 function saveDistance() {
   localStorage.setItem(distanceStorageKey, String(distanceKm));
@@ -39,24 +34,30 @@ function updateDistanceText() {
   distanceEl.textContent = `${distanceKm.toFixed(1)} km`;
 }
 
-function resetDistance() {
+function resetDistanceFromCommand() {
   distanceKm = 0;
   lastPoint = null;
   saveDistance();
   updateDistanceText();
-
-  const oldText = resetBtn.textContent;
-  resetBtn.textContent = "Nollattu!";
-  setTimeout(() => {
-    resetBtn.textContent = oldText;
-  }, 1200);
 }
 
-resetBtn.addEventListener("click", resetDistance);
-resetBtn.addEventListener("touchstart", (event) => {
-  event.preventDefault();
-  resetDistance();
-}, { passive: false });
+function checkResetCommand() {
+  const currentCommand = localStorage.getItem(resetCommandKey) || "";
+
+  if (currentCommand && currentCommand !== lastSeenResetCommand) {
+    lastSeenResetCommand = currentCommand;
+    resetDistanceFromCommand();
+  }
+}
+
+// Pollaus, koska IRL Pron eri web overlayt eivät aina lähetä storage-eventtejä.
+setInterval(checkResetCommand, 500);
+
+window.addEventListener("storage", (event) => {
+  if (event.key === resetCommandKey) {
+    checkResetCommand();
+  }
+});
 
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -75,6 +76,8 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 function handlePosition(position) {
+  checkResetCommand();
+
   const lat = position.coords.latitude;
   const lon = position.coords.longitude;
   const accuracy = position.coords.accuracy ?? 9999;
@@ -140,12 +143,14 @@ function startGps() {
 }
 
 function startDemo() {
-  distanceKm = 12.4;
-  updateDistanceText();
+  let demoDistance = 12.4;
+  distanceEl.textContent = `${demoDistance.toFixed(1)} km`;
 
-  demoTimer = setInterval(() => {
-    distanceKm += Math.random() * 0.25;
-    updateDistanceText();
+  setInterval(() => {
+    checkResetCommand();
+    demoDistance += Math.random() * 0.25;
+    if (distanceKm === 0) demoDistance = 0;
+    distanceEl.textContent = `${demoDistance.toFixed(1)} km`;
   }, 3000);
 }
 
